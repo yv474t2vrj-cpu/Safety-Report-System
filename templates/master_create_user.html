@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Create User — Master</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    form {max-width:480px}
+    label {display:block;margin-bottom:8px}
+    input, select {width:100%;padding:8px;margin-top:4px}
+    .actions {margin-top:12px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Create User (Master)</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, msg in messages %}
+            <li class="{{ category }}">{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post">
+      <label>Username
+        <input name="username" required>
+      </label>
+      <label>Email
+        <input name="email" type="email" required>
+      </label>
+      <label>Password
+        <input name="password" type="password" required>
+      </label>
+      <label>Role
+        <select name="role">
+          <option value="user">user</option>
+          <option value="admin">admin</option>
+          <option value="master">master</option>
+        </select>
+      </label>
+
+      <div class="actions">
+        <button type="submit">Create</button>
+        &nbsp; <a href="{{ url_for('master_users') }}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Users — Master</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .users-table{border-collapse:collapse;width:100%;margin-top:16px}
+    .users-table th,.users-table td{border:1px solid #ddd;padding:8px}
+    .users-table th{background:#0c2461;color:#fff}
+    .actions form{display:inline}
+    .top-links{margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Users (Master)</h1>
+    <div class="top-links">
+      <a class="btn" href="{{ url_for('master_create_user') }}">Create User</a>
+      &nbsp;|&nbsp;
+      <a class="btn" href="{{ url_for('home') }}">Back to Dashboard</a>
+    </div>
+
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.id }}</td>
+          <td>{{ u.username }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.role }}</td>
+          <td>{{ u.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+          <td class="actions">
+            {% if u.role != 'master' %}
+            <form method="post" action="{{ url_for('master_delete_user', user_id=u.id) }}" onsubmit="return confirm('Delete user {{ u.username }}?')">
+              <button type="submit">Delete</button>
+            </form>
+            {% else %}
+            —
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

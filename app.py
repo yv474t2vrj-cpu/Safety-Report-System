@@ -138,25 +138,7 @@ def register():
 @master_required
 def master_users():
     users = User.query.order_by(User.created_at.desc()).all()
-    html = '''
-    <html><head><meta charset="utf-8"><title>Users - Master</title>
-    <style>table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px}th{background:#0c2461;color:#fff}</style>
-    </head><body>
-    <h2>Users (Master)</h2>
-    <p><a href="/master/create_user">Create User</a> | <a href="/">Back to Dashboard</a></p>
-    <table>
-      <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
-      <tbody>
-    '''
-
-    for u in users:
-        delete_button = ''
-        if u.role != 'master':
-            delete_button = f"<form method='post' action='/master/delete_user/{u.id}' style='display:inline' onsubmit=\"return confirm('Delete user {u.username}?')\"><button type='submit'>Delete</button></form>"
-        html += f"<tr><td>{u.id}</td><td>{u.username}</td><td>{u.email}</td><td>{u.role}</td><td>{u.created_at.strftime('%Y-%m-%d %H:%M')}</td><td>{delete_button}</td></tr>"
-
-    html += "</tbody></table></body></html>"
-    return html
+    return render_template('master_users.html', users=users)
 
 
 @app.route('/master/create_user', methods=['GET', 'POST'])
@@ -183,20 +165,7 @@ def master_create_user():
             flash(f'User {username} created successfully.', 'success')
             return redirect(url_for('home'))
 
-    # Simple inline form so no new template is required
-    return '''
-    <html><body>
-    <h2>Create User (Master only)</h2>
-    <form method="post">
-      <label>Username: <input name="username"></label><br>
-      <label>Email: <input name="email"></label><br>
-      <label>Password: <input type="password" name="password"></label><br>
-      <label>Role: <select name="role"><option value="user">user</option><option value="admin">admin</option></option><option value="master">master</option></select></label><br>
-      <button type="submit">Create</button>
-    </form>
-    <p><a href="/">Back to Dashboard</a></p>
-    </body></html>
-    '''
+        return render_template('master_create_user.html')
 
 
 @app.route('/master/delete_user/<int:user_id>', methods=['POST'])
