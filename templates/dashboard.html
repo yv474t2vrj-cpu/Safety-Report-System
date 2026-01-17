@@ -1,0 +1,780 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-brand h1 {
+            color: #0c2461;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-links a, .nav-links button {
+            text-decoration: none;
+            color: #0c2461;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover, .nav-links button:hover {
+            background: #0c2461;
+            color: white;
+        }
+
+        .user-info {
+            color: #0c2461;
+            font-weight: 600;
+            background: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 25px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h2 {
+            color: #0c2461;
+            font-size: 2.2rem;
+        }
+
+        .header p {
+            color: #666;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(12, 36, 97, 0.2);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(12, 36, 97, 0.3);
+        }
+
+        .btn-report {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .btn-statistics {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        /* STATISTICS SECTIONS */
+        .stats-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .stats-sections {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-section h3 {
+            color: #0c2461;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #0c2461;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-section h3 i {
+            color: #3498db;
+        }
+
+        /* SUMMARY STATS */
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-card h4 {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .summary-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #0c2461;
+            margin: 10px 0;
+        }
+
+        .summary-subtext {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        /* STATS LIST */
+        .stats-list {
+            list-style: none;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stats-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        .item-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .item-count {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 16px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* SEVERITY SPECIFIC */
+        .severity-item.severity-high .item-count {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .severity-item.severity-medium .item-count {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .severity-item.severity-low .item-count {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        /* CHART CONTAINER */
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container h3 {
+            color: #0c2461;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #0c2461;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 250px;
+        }
+
+        .chart-box h4 {
+            color: #444;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* RECENT INCIDENTS */
+        .recent-table {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .recent-table h3 {
+            color: #0c2461;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #0c2461;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #0c2461;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-open {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .severity-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .severity-high {
+            background: #e74c3c;
+        }
+
+        .severity-medium {
+            background: #f39c12;
+        }
+
+        .severity-low {
+            background: #27ae60;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-shield-alt"></i>
+            <h1>Safety Management System</h1>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="{{ url_for('report_incident') }}"><i class="fas fa-plus-circle"></i> Report</a>
+            <a href="{{ url_for('export_csv') }}"><i class="fas fa-file-csv"></i> Export CSV</a>
+            <a href="{{ url_for('statistics') }}"><i class="fas fa-chart-bar"></i> Statistics</a>
+            <span class="user-info"><i class="fas fa-user"></i> {{ current_user.username }}{% if current_user.is_authenticated %} (<strong>{{ current_user.role }}</strong>){% endif %}</span>
+            <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'error' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="header">
+            <h2>Safety Dashboard Overview</h2>
+            <p>Real-time safety metrics and incident tracking</p>
+        </div>
+
+        <div class="quick-actions">
+            <button class="action-btn btn-report" onclick="window.location.href='{{ url_for('report_incident') }}'">
+                <i class="fas fa-exclamation-triangle"></i> Report New Incident
+            </button>
+            <button class="action-btn btn-export" onclick="window.location.href='{{ url_for('export_csv') }}'">
+                <i class="fas fa-download"></i> Export Incident Data
+            </button>
+            <button class="action-btn" onclick="window.location.href='{{ url_for('export_html') }}'" target="_blank">
+                <i class="fas fa-file-alt"></i> Generate HTML Report
+            </button>
+            <button class="action-btn btn-statistics" onclick="window.location.href='{{ url_for('statistics') }}'">
+                <i class="fas fa-chart-pie"></i> View Statistics
+            </button>
+        </div>
+
+        <!-- SUMMARY STATISTICS -->
+        <div class="summary-stats">
+            <div class="summary-card">
+                <h4>TOTAL INCIDENTS</h4>
+                <div class="summary-value" id="total-incidents">0</div>
+                <div class="summary-subtext">All reported incidents</div>
+            </div>
+            <div class="summary-card">
+                <h4>OPEN ISSUES</h4>
+                <div class="summary-value" id="open-issues">0</div>
+                <div class="summary-subtext">Requiring attention</div>
+            </div>
+            <div class="summary-card">
+                <h4>RESOLVED</h4>
+                <div class="summary-value" id="resolved">0</div>
+                <div class="summary-subtext">Successfully closed</div>
+            </div>
+        </div>
+
+        <!-- DETAILED STATISTICS SECTIONS -->
+        <div class="stats-sections">
+            <!-- BY INCIDENT TYPE -->
+            <div class="stat-section">
+                <h3><i class="fas fa-list-alt"></i> By Incident Type</h3>
+                <ul class="stats-list" id="type-stats">
+                    <!-- Will be populated by JavaScript -->
+                    <li class="stats-item">
+                        <div class="item-label">
+                            <div class="item-icon" style="background: #3498db;">
+                                <i class="fas fa-plane-departure"></i>
+                            </div>
+                            <span>Loading...</span>
+                        </div>
+                        <div class="item-count">0</div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- BY SEVERITY LEVEL -->
+            <div class="stat-section">
+                <h3><i class="fas fa-exclamation-circle"></i> By Severity Level</h3>
+                <ul class="stats-list" id="severity-stats">
+                    <!-- Will be populated by JavaScript -->
+                    <li class="stats-item severity-item severity-high">
+                        <div class="item-label">
+                            <div class="item-icon" style="background: #e74c3c;">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                            <span>High</span>
+                        </div>
+                        <div class="item-count">0</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CHARTS SECTION -->
+        <div class="chart-container">
+            <h3>Incident Distribution</h3>
+            <div class="chart-grid">
+                <div class="chart-box">
+                    <h4>By Type Distribution</h4>
+                    <div id="type-chart"></div>
+                </div>
+                <div class="chart-box">
+                    <h4>By Severity Distribution</h4>
+                    <div id="severity-chart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECENT INCIDENTS TABLE -->
+        <div class="recent-table">
+            <h3>Recent Incidents</h3>
+            <table id="incidents-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Date Reported</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will load here -->
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 30px; color: #888;">
+                            <i class="fas fa-spinner fa-spin"></i> Loading incidents...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Color mapping for incident types
+        const typeColors = {
+            'ground_ops': '#3498db',
+            'maintenance': '#2ecc71',
+            'medical': '#9b59b6',
+            'safety': '#e67e22',
+            'security': '#e74c3c',
+            'other': '#95a5a6'
+        };
+
+        // Color mapping for severity
+        const severityColors = {
+            'High': '#e74c3c',
+            'Medium': '#f39c12',
+            'Low': '#27ae60'
+        };
+
+        // Icon mapping for incident types
+        const typeIcons = {
+            'ground_ops': 'fa-plane-departure',
+            'maintenance': 'fa-tools',
+            'medical': 'fa-first-aid',
+            'safety': 'fa-exclamation-triangle',
+            'security': 'fa-shield-alt',
+            'other': 'fa-question-circle'
+        };
+
+        // Function to format incident type labels with proper capitalization
+        function formatTypeLabel(type) {
+            // Convert underscores to spaces and capitalize each word
+            return type
+                .replace(/_/g, ' ')  // Replace underscores with spaces
+                .replace(/\b\w/g, char => char.toUpperCase())  // Capitalize first letter of each word
+                .replace('Ops', 'Ops');  // Keep "Ops" as is (not "Ops")
+        }
+
+        async function loadDashboardData() {
+            try {
+                // Load stats
+                const statsRes = await fetch('/api/stats');
+                const stats = await statsRes.json();
+                
+                // Update summary cards
+                document.getElementById('total-incidents').textContent = stats.total;
+                document.getElementById('open-issues').textContent = stats.open;
+                document.getElementById('resolved').textContent = stats.resolved;
+                
+                // Update incident type statistics
+                const typeStatsList = document.getElementById('type-stats');
+                typeStatsList.innerHTML = '';
+                
+                if (stats.chart_data && stats.chart_data.types) {
+                    for (const [type, count] of Object.entries(stats.chart_data.types)) {
+                        const typeKey = type.toLowerCase().replace(/ /g, '_');
+                        const formattedType = formatTypeLabel(typeKey);
+                        const iconClass = typeIcons[typeKey] || 'fa-question-circle';
+                        const color = typeColors[typeKey] || '#95a5a6';
+                        
+                        const li = document.createElement('li');
+                        li.className = 'stats-item';
+                        li.innerHTML = `
+                            <div class="item-label">
+                                <div class="item-icon" style="background: ${color};">
+                                    <i class="fas ${iconClass}"></i>
+                                </div>
+                                <span>${formattedType}</span>
+                            </div>
+                            <div class="item-count">${count}</div>
+                        `;
+                        typeStatsList.appendChild(li);
+                    }
+                }
+                
+                // Update severity statistics
+                const severityStatsList = document.getElementById('severity-stats');
+                severityStatsList.innerHTML = '';
+                
+                if (stats.chart_data && stats.chart_data.severities) {
+                    for (const [severity, count] of Object.entries(stats.chart_data.severities)) {
+                        const color = severityColors[severity] || '#95a5a6';
+                        const severityClass = severity.toLowerCase();
+                        
+                        const li = document.createElement('li');
+                        li.className = `stats-item severity-item severity-${severityClass}`;
+                        li.innerHTML = `
+                            <div class="item-label">
+                                <div class="item-icon" style="background: ${color};">
+                                    <i class="fas fa-circle"></i>
+                                </div>
+                                <span>${severity}</span>
+                            </div>
+                            <div class="item-count">${count}</div>
+                        `;
+                        severityStatsList.appendChild(li);
+                    }
+                }
+                
+                // Create text-based charts
+                createTypeChart(stats.chart_data?.types || {});
+                createSeverityChart(stats.chart_data?.severities || {});
+                
+                // Load incidents
+                const incidentsRes = await fetch('/api/incidents');
+                const incidents = await incidentsRes.json();
+                
+                const tableBody = document.querySelector('#incidents-table tbody');
+                tableBody.innerHTML = '';
+                
+                incidents.slice(0, 10).forEach(inc => {
+                    const row = document.createElement('tr');
+                    
+                    // Determine badge classes
+                    const statusClass = inc.status === 'Open' ? 'status-open' : 'status-resolved';
+                    const severityClass = inc.severity === 'High' ? 'severity-high' : 
+                                         inc.severity === 'Medium' ? 'severity-medium' : 'severity-low';
+                    
+                    // Format the incident type for display
+                    const formattedIncType = formatTypeLabel(inc.type.toLowerCase().replace(/ /g, '_'));
+                    
+                    row.innerHTML = `
+                        <td>${inc.id}</td>
+                        <td><strong>${inc.title}</strong></td>
+                        <td>${formattedIncType}</td>
+                        <td><span class="severity-badge ${severityClass}">${inc.severity}</span></td>
+                        <td><span class="status-badge ${statusClass}">${inc.status}</span></td>
+                        <td>${inc.date_reported}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.querySelector('#incidents-table tbody').innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 30px; color: #e74c3c;">
+                            <i class="fas fa-exclamation-triangle"></i> Error loading data. Please refresh the page.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        function createTypeChart(typeData) {
+            const container = document.getElementById('type-chart');
+            if (Object.keys(typeData).length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">No data available</div>';
+                return;
+            }
+            
+            let total = Object.values(typeData).reduce((a, b) => a + b, 0);
+            let html = '<div style="padding: 10px;">';
+            
+            for (const [type, count] of Object.entries(typeData)) {
+                const typeKey = type.toLowerCase().replace(/ /g, '_');
+                const formattedType = formatTypeLabel(typeKey);
+                const color = typeColors[typeKey] || '#95a5a6';
+                const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                const width = percentage + '%';
+                
+                html += `
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="font-weight: 500;">${formattedType}</span>
+                            <span style="font-weight: 600;">${count} (${percentage}%)</span>
+                        </div>
+                        <div style="background: #e0e0e0; height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: ${color}; height: 100%; width: ${width}; border-radius: 6px;"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        function createSeverityChart(severityData) {
+            const container = document.getElementById('severity-chart');
+            if (Object.keys(severityData).length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">No data available</div>';
+                return;
+            }
+            
+            let total = Object.values(severityData).reduce((a, b) => a + b, 0);
+            let html = '<div style="padding: 10px;">';
+            
+            // Sort by severity level (High, Medium, Low)
+            const sortedSeverities = ['High', 'Medium', 'Low'].filter(s => severityData[s]);
+            
+            sortedSeverities.forEach(severity => {
+                const count = severityData[severity] || 0;
+                const color = severityColors[severity] || '#95a5a6';
+                const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                const width = percentage + '%';
+                
+                html += `
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="font-weight: 500;">${severity}</span>
+                            <span style="font-weight: 600;">${count} (${percentage}%)</span>
+                        </div>
+                        <div style="background: #e0e0e0; height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div style="background: ${color}; height: 100%; width: ${width}; border-radius: 6px;"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadDashboardData, 30000);
+    </script>
+</body>
+</html>
