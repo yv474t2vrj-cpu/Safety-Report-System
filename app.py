@@ -3,6 +3,7 @@ from flask import Flask, render_template, jsonify, request, flash, redirect, url
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user    
 from datetime import datetime, timedelta
+from functools import wraps
 import os
 import io
 import csv
@@ -76,6 +77,16 @@ class Incident(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+def master_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.role != 'master':
+            flash('Access denied. Master admin only.', 'error')
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated
+
 # ==================== ROUTES ====================
 
 @app.route('/')
@@ -118,6 +129,62 @@ def register():
             return redirect(url_for('login'))
 
     return render_template('register.html')
+
+
+@app.route('/master/create_user', methods=['GET', 'POST'])
+@login_required
+@master_required
+def master_create_user():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        role = request.form.get('role', 'user')
+
+        if not username or not email or not password:
+            flash('Username, email and password are required', 'error')
+        elif User.query.filter_by(username=username).first():
+            flash('Username already exists', 'error')
+        elif User.query.filter_by(email=email).first():
+            flash('Email already exists', 'error')
+        else:
+            user = User(username=username, email=email, role=role)
+            user.set_password(password)
+            db.session.add(user)
+            db.session.commit()
+            flash(f'User {username} created successfully.', 'success')
+            return redirect(url_for('home'))
+
+    # Simple inline form so no new template is required
+    return '''
+    <html><body>
+    <h2>Create User (Master only)</h2>
+    <form method="post">
+      <label>Username: <input name="username"></label><br>
+      <label>Email: <input name="email"></label><br>
+      <label>Password: <input type="password" name="password"></label><br>
+      <label>Role: <select name="role"><option value="user">user</option><option value="admin">admin</option></option><option value="master">master</option></select></label><br>
+      <button type="submit">Create</button>
+    </form>
+    <p><a href="/">Back to Dashboard</a></p>
+    </body></html>
+    '''
+
+
+@app.route('/master/delete_user/<int:user_id>', methods=['POST'])
+@login_required
+@master_required
+def master_delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    # Prevent deleting the master account via this route
+    if user.role == 'master':
+        flash('Cannot delete a master account via this route', 'error')
+        return redirect(url_for('home'))
+
+    db.session.delete(user)
+    db.session.commit()
+    flash(f'User {user.username} deleted; their incident entries were preserved.', 'success')
+    return redirect(url_for('home'))
 
 @app.route('/logout')
 @login_required
@@ -281,7 +348,8 @@ def export_html():
     <body>
         <h1>Safety Incidents Report</h1>
 
-        <div class="header">
+        <div class="header" style="position:relative;">
+            <a href="/" style="position:absolute; right:20px; top:20px; background:#0c2461; color:#fff; padding:10px 14px; border-radius:6px; text-decoration:none; font-weight:600;">Back to Dashboard</a>
             <h2>Report Summary</h2>
             <p><strong>Generated:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
             <p><strong>Reported by:</strong> {current_user.username}</p>
@@ -436,6 +504,12 @@ with app.app_context():
         admin = User(username='admin', email='admin@safety.com', role='admin')
         admin.set_password('admin123')
         db.session.add(admin)
+        db.session.commit()
+    # Create a master account (can manage users) if missing
+    if not User.query.filter_by(username='master').first():
+        master = User(username='master', email='master@safety.com', role='master')
+        master.set_password('master123')
+        db.session.add(master)
         db.session.commit()
 
 if __name__ == '__main__':
