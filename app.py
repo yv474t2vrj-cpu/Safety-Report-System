@@ -107,6 +107,8 @@ def login():
             flash('Invalid username or password', 'error')
     return render_template('login.html')
 @app.route('/register', methods=['GET', 'POST'])
+@login_required
+@master_required
 def register():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -129,6 +131,32 @@ def register():
             return redirect(url_for('login'))
 
     return render_template('register.html')
+
+
+@app.route('/master/users')
+@login_required
+@master_required
+def master_users():
+    users = User.query.order_by(User.created_at.desc()).all()
+    html = '''
+    <html><head><meta charset="utf-8"><title>Users - Master</title>
+    <style>table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px}th{background:#0c2461;color:#fff}</style>
+    </head><body>
+    <h2>Users (Master)</h2>
+    <p><a href="/master/create_user">Create User</a> | <a href="/">Back to Dashboard</a></p>
+    <table>
+      <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
+      <tbody>
+    '''
+
+    for u in users:
+        delete_button = ''
+        if u.role != 'master':
+            delete_button = f"<form method='post' action='/master/delete_user/{u.id}' style='display:inline' onsubmit=\"return confirm('Delete user {u.username}?')\"><button type='submit'>Delete</button></form>"
+        html += f"<tr><td>{u.id}</td><td>{u.username}</td><td>{u.email}</td><td>{u.role}</td><td>{u.created_at.strftime('%Y-%m-%d %H:%M')}</td><td>{delete_button}</td></tr>"
+
+    html += "</tbody></table></body></html>"
+    return html
 
 
 @app.route('/master/create_user', methods=['GET', 'POST'])
