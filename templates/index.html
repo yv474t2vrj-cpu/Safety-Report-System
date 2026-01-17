@@ -1,0 +1,269 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Safety Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: "Segoe UI", sans-serif; 
+            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+        header h1 { 
+            color: #0c2461; 
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .subtitle { color: #666; margin-top: 5px; }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .card h2 { 
+            color: #0c2461; 
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f1f2f6;
+            padding-bottom: 10px;
+        }
+        
+        .metric-large {
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: #0c2461;
+            margin: 20px 0;
+        }
+        
+        .metric-detail {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0c2461;
+        }
+        
+        .positive {
+            background: #d4edda;
+            color: #155724;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .report-btn, .support-btn {
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .report-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+        .support-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+        
+        .type-item, .incident-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .severity-bar {
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .high { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+        .medium { background: linear-gradient(90deg, #f39c12, #e67e22); }
+        .low { background: linear-gradient(90deg, #27ae60, #229954); }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #0c2461;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔒 SAFETY OVERVIEW</h1>
+            <p class="subtitle">Real-time safety metrics and incident tracking</p>
+        </header>
+        
+        <div class="dashboard">
+            <div class="left-column">
+                <div class="card">
+                    <h2>TOTAL INCIDENTS</h2>
+                    <div class="metric-large">5</div>
+                    <div class="metric-detail">
+                        <span>OPEN ISSUES</span>
+                        <span class="metric-value">3</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2>CRITICAL ALERTS</h2>
+                    <div class="metric-large">0</div>
+                    <div class="metric-detail">
+                        <span>RESOLVED</span>
+                        <span class="metric-value">2</span>
+                        <span class="positive">+12%</span>
+                        <span>vs last month</span>
+                    </div>
+                </div>
+                
+                <button class="report-btn" onclick="alert('Report Incident form would open here')">
+                    📝 Report Incident
+                </button>
+                <button class="support-btn" onclick="alert('Support: 1-800-SAFETY-911')">
+                    ❓ Support Incident
+                </button>
+            </div>
+            
+            <div class="right-column">
+                <div class="card">
+                    <h2>INCIDENTS BY TYPE</h2>
+                    <div id="incident-types">
+                        <div class="type-item">
+                            <span>ground_ops</span>
+                            <span>(4)</span>
+                        </div>
+                        <div class="type-item">
+                            <span>maintenance</span>
+                            <span>(1)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2>RECENT INCIDENTS</h2>
+                    <div id="recent-incidents">
+                        <div class="incident-item">
+                            <div><strong>DELAY FLIGHT 3 HOURS</strong></div>
+                            <div>MJL - Jan 12, 2026</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2>SEVERITY BREAKDOWN</h2>
+                    <div id="severity-chart">
+                        <div class="severity-bar high">High</div>
+                        <div class="severity-bar medium">Medium</div>
+                        <div class="severity-bar low">Low</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>ALL INCIDENTS</h2>
+            <table id="incidents-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><strong>DELAY FLIGHT 3 HOURS</strong></td>
+                        <td>ground_ops</td>
+                        <td>Medium</td>
+                        <td>Open</td>
+                        <td>Jan 12, 2026</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><strong>Equipment malfunction</strong></td>
+                        <td>maintenance</td>
+                        <td>High</td>
+                        <td>Resolved</td>
+                        <td>Jan 10, 2026</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        // Simple JavaScript for interactivity
+        document.querySelector('.report-btn').addEventListener('click', function() {
+            const title = prompt('Enter incident title:');
+            if (title) {
+                alert(`Incident "${title}" reported! (In real app, this would save to database)`);
+            }
+        });
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            console.log('Refreshing data...');
+        }, 30000);
+    </script>
+</body>
+</html>

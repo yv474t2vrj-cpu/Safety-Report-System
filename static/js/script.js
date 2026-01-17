@@ -1,0 +1,1 @@
+'@ | Out-File -FilePath "static\js\script.js" -Encoding UTF8

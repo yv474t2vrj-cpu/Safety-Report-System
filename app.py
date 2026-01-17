@@ -99,10 +99,15 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        login_type = request.form.get('login_type', 'user')
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
-            login_user(user)
-            return redirect(url_for('home'))
+            # If user selected admin login, require admin or master role
+            if login_type == 'admin' and user.role not in ('admin', 'master'):
+                flash('Admin/Master credentials required for this login option', 'error')
+            else:
+                login_user(user)
+                return redirect(url_for('home'))
         else:
             flash('Invalid username or password', 'error')
     return render_template('login.html')

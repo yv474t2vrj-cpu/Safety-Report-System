@@ -1,0 +1,3 @@
+@'
+/* Paste the entire CSS code here from my earlier message */
+'@ | Out-File -FilePath "static\css\style.css" -Encoding UTF8

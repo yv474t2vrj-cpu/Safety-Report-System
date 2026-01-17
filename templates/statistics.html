@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Statistics - Safety Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nav-brand h1 {
+            color: #0c2461;
+            font-size: 1.2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #0c2461;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-links a:hover {
+            background: #0c2461;
+            color: white;
+        }
+        
+        .statistics-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+            padding: 0;
+            margin-top: 60px;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #0c2461, #1e3799);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .header h1 i {
+            font-size: 40px;
+            color: #4cd137;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .stats-content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #3498db;
+        }
+        
+        .stats-list {
+            list-style: none;
+        }
+        
+        .stats-item {
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            padding: 18px 25px;
+            border-radius: 12px;
+            border-left: 5px solid #3498db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .stats-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: #e3f2fd;
+        }
+        
+        .item-label {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .item-count {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 20px;
+            min-width: 60px;
+            text-align: center;
+            border: 2px solid #bbdefb;
+        }
+        
+        .severity-section .stats-item {
+            border-left-color: #e74c3c;
+        }
+        
+        .severity-section .item-count {
+            background: #ffebee;
+            color: #d32f2f;
+            border-color: #ffcdd2;
+        }
+        
+        .severity-section .item-icon {
+            background: #e74c3c;
+        }
+        
+        .severity-item.severity-high {
+            border-left-color: #e74c3c;
+        }
+        
+        .severity-item.severity-medium {
+            border-left-color: #f39c12;
+        }
+        
+        .severity-item.severity-low {
+            border-left-color: #27ae60;
+        }
+        
+        .severity-item.severity-high .item-count {
+            background: #ffebee;
+            color: #d32f2f;
+            border-color: #ffcdd2;
+        }
+        
+        .severity-item.severity-medium .item-count {
+            background: #fff3e0;
+            color: #f57c00;
+            border-color: #ffe0b2;
+        }
+        
+        .severity-item.severity-low .item-count {
+            background: #e8f5e9;
+            color: #388e3c;
+            border-color: #c8e6c9;
+        }
+        
+        .summary-box {
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .summary-box h3 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .summary-box h3 i {
+            color: #4cd137;
+        }
+        
+        .total-incidents {
+            font-size: 48px;
+            font-weight: 800;
+            margin: 20px 0;
+            color: #4cd137;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .summary-text {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            background: #f8f9fa;
+        }
+        
+        .footer i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px 15px;
+            }
+            
+            .nav-brand h1 {
+                font-size: 1rem;
+            }
+            
+            .nav-links a span {
+                display: none;
+            }
+            
+            .nav-links a {
+                padding: 8px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .stats-content {
+                padding: 25px;
+            }
+            
+            .stats-item {
+                padding: 15px 20px;
+            }
+            
+            .item-label {
+                font-size: 16px;
+            }
+            
+            .item-count {
+                font-size: 18px;
+                padding: 6px 15px;
+            }
+            
+            .total-incidents {
+                font-size: 36px;
+            }
+            
+            .back-btn span {
+                display: none;
+            }
+            
+            .back-btn {
+                padding: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 30px 20px 30px 70px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stats-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .item-count {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-shield-alt"></i>
+            <h1>Safety Management System</h1>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('statistics') }}"><i class="fas fa-chart-bar"></i> <span>Statistics</span></a>
+            <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+        </div>
+    </nav>
+
+    <div class="statistics-container">
+        <div class="header">
+            <a href="{{ url_for('home') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+            <h1>
+                <i class="fas fa-chart-pie"></i>
+                Incident Statistics Report
+            </h1>
+            <div class="subtitle">Comprehensive overview of safety incidents</div>
+        </div>
+        
+        <div class="stats-content">
+            <!-- By Incident Type Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-list-ol"></i>
+                    By Incident Type
+                </h2>
+                <ul class="stats-list">
+                    <li class="stats-item">
+                        <div class="item-label">
+                            <div class="item-icon">
+                                <i class="fas fa-plane-departure"></i>
+                            </div>
+                            <span>Ground Operations</span>
+                        </div>
+                        <div class="item-count">{{ stats.by_type.get('ground_ops', 0) }}</div>
+                    </li>
+                    <li class="stats-item">
+                        <div class="item-label">
+                            <div class="item-icon">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <span>Maintenance</span>
+                        </div>
+                        <div class="item-count">{{ stats.by_type.get('maintenance', 0) }}</div>
+                    </li>
+                    <li class="stats-item">
+                        <div class="item-label">
+                            <div class="item-icon">
+                                <i class="fas fa-first-aid"></i>
+                            </div>
+                            <span>Medical</span>
+                        </div>
+                        <div class="item-count">{{ stats.by_type.get('medical', 0) }}</div>
+                    </li>
+                    <li class="stats-item">
+                        <div class="item-label">
+                            <div class="item-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <span>Safety</span>
+                        </div>
+                        <div class="item-count">{{ stats.by_type.get('safety', 0) }}</div>
+                    </li>
+                    <li class="stats-item">
+                        <div class="item-label">
+                            <div class="item-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <span>Security</span>
+                        </div>
+                        <div class="item-count">{{ stats.by_type.get('security', 0) }}</div>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- By Severity Section -->
+            <div class="section severity-section">
+                <h2 class="section-title">
+                    <i class="fas fa-exclamation-circle"></i>
+                    By Severity Level
+                </h2>
+                <ul class="stats-list">
+                    <li class="stats-item severity-item severity-high">
+                        <div class="item-label">
+                            <div class="item-icon">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                            <span>High</span>
+                        </div>
+                        <div class="item-count">{{ stats.by_severity.get('High', 0) }}</div>
+                    </li>
+                    <li class="stats-item severity-item severity-medium">
+                        <div class="item-label">
+                            <div class="item-icon">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                            <span>Medium</span>
+                        </div>
+                        <div class="item-count">{{ stats.by_severity.get('Medium', 0) }}</div>
+                    </li>
+                    <li class="stats-item severity-item severity-low">
+                        <div class="item-label">
+                            <div class="item-icon">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                            <span>Low</span>
+                        </div>
+                        <div class="item-count">{{ stats.by_severity.get('Low', 0) }}</div>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Summary Section -->
+            <div class="summary-box">
+                <h3>
+                    <i class="fas fa-chart-line"></i>
+                    Summary
+                </h3>
+                <div class="total-incidents">{{ stats.total }}</div>
+                <div class="summary-text">
+                    Total incidents reported and analyzed.<br>
+                    {% if stats.by_type %}
+                        <strong>Most common:</strong> 
+                        {% set max_type = stats.by_type|dictsort(by='value')|last %}
+                        {{ max_type[0]|replace('_', ' ')|title }} ({{ max_type[1] }} incidents)<br>
+                    {% endif %}
+                    {% if stats.by_severity %}
+                        <strong>Highest severity:</strong> 
+                        {% set max_severity = stats.by_severity|dictsort(by='value')|last %}
+                        {{ max_severity[0] }} ({{ max_severity[1] }} incidents)
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>
+                <i class="far fa-clock"></i>
+                Last updated: {{ now.strftime('%Y-%m-%d %H:%M') if now else 'Today' }}
+            </p>
+            <p style="margin-top: 10px; font-size: 12px;">
+                <i class="fas fa-info-circle"></i>
+                This report is automatically generated from the Safety Dashboard System
+            </p>
+        </div>
+    </div>
+</body>
+</html>
